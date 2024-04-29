@@ -1,33 +1,24 @@
 import os
-import http.server
-import socketserver
-import requests
+import aiohttp
+from aiohttp import web
 
-from http import HTTPStatus
+async def handle(request):
+    # Making a request to the specified endpoint
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://orca-app-g3w23.ondigitalocean.app/sample/hello') as response:
+            if response.status == 200:
+                response_content = await response.text()
+            else:
+                response_content = "Failed to fetch response from endpoint"
 
+    # Appending the response content to the message
+    msg = f'Hello! you requested {request.path}. Response from endpoint: {response_content}'
+    return web.Response(text=msg)
 
-class Handler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        # Making a request to the specified endpoint
-        endpoint = 'https://orca-app-g3w23.ondigitalocean.app/sample/hello'
-        response = requests.get(endpoint)
-        
-        # Checking if the request was successful
-        if response.status_code == 200:
-            # Extracting the response content
-            response_content = response.text
-        else:
-            response_content = "Failed to fetch response from endpoint"
+port = int(os.getenv('PORT', 8080))
 
-        self.send_response(HTTPStatus.OK)
-        self.end_headers()
-        
-        # Appending the response content to the message
-        msg = 'Hello! you requested %s. Response from endpoint: %s' % (self.path, response_content)
-        self.wfile.write(msg.encode())
+app = web.Application()
+app.router.add_get('/', handle)
+app.router.add_get('/{name}', handle)
 
-
-port = int(os.getenv('PORT', 80))
-print('Listening on port %s' % (port))
-httpd = socketserver.TCPServer(('', port), Handler)
-httpd.serve_forever()
+web.run_app(app, port=port)
