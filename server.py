@@ -5,7 +5,8 @@ from aiohttp import web
 async def handle(request):
     # Making a request to the specified endpoint
     async with aiohttp.ClientSession() as session:
-        async with session.get('https://orca-app-g3w23.ondigitalocean.app/sample/hello') as response:
+        async with session.get('https://faas-blr1-8177d592.doserverless.co/api/v1/web/fn-100bea51-4ace-4d4f-bd57-ec37b1664387/default/python',
+                               headers={"Content-Type": "application/json", "X-Require-Whisk-Auth": "Ne7r8kmzYl0wswE"}) as response:
             if response.status == 200:
                 response_content = await response.text()
             else:
