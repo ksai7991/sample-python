@@ -22,7 +22,7 @@ async def handle(request):
     return web.Response(text=msg)
 
 async def delayed_startup(app):
-    await asyncio.sleep(60)  # Delay server startup by 2 minutes
+    await asyncio.sleep(120)  # Delay server startup by 2 minutes
     print("Server startup delayed by 2 minutes")
 
 port = int(os.getenv('PORT', 8080))
