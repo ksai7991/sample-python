@@ -2,6 +2,7 @@ import os
 import aiohttp
 from aiohttp import web
 import asyncio
+import socket
 
 async def handle(request):
     # Making a request to the specified endpoint
@@ -13,12 +14,15 @@ async def handle(request):
             else:
                 response_content = "Failed to fetch response from endpoint"
 
-    # Appending the response content to the message
-    msg = f'Hello! you requested {request.path}. Response from endpoint: {response_content}'
+    # Get the hostname
+    hostname = socket.gethostname()
+
+    # Appending the response content and hostname to the message
+    msg = f'Hello! You requested {request.path}. Response from endpoint: {response_content}. Hostname: {hostname}'
     return web.Response(text=msg)
 
 async def delayed_startup(app):
-    await asyncio.sleep(15)  # Delay server startup by 2 minutes
+    await asyncio.sleep(40)  # Delay server startup by 2 minutes
     print("Server startup delayed by 2 minutes")
 
 port = int(os.getenv('PORT', 8080))
