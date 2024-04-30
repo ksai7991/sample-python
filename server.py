@@ -1,6 +1,7 @@
 import os
 import aiohttp
 from aiohttp import web
+import asyncio
 
 async def handle(request):
     # Making a request to the specified endpoint
@@ -16,10 +17,17 @@ async def handle(request):
     msg = f'Hello! you requested {request.path}. Response from endpoint: {response_content}'
     return web.Response(text=msg)
 
+async def delayed_startup(app):
+    await asyncio.sleep(120)  # Delay server startup by 2 minutes
+    print("Server startup delayed by 2 minutes")
+
 port = int(os.getenv('PORT', 8080))
 
 app = web.Application()
 app.router.add_get('/', handle)
 app.router.add_get('/{name}', handle)
+
+# Register delayed startup coroutine
+app.on_startup.append(delayed_startup)
 
 web.run_app(app, port=port)
