@@ -1,6 +1,7 @@
 name: sample-python
 services:
 - environment_slug: python
+  protocol: HTTP2
   github:
     branch: main
     deploy_on_push: true
