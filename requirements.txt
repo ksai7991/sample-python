@@ -2,4 +2,5 @@ aiohttp==3.9.5
 requests==2.31.0
 grpcio
 grpcio-tools
+asyncpg
 
