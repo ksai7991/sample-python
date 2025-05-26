@@ -1,4 +1,5 @@
 import logging
+import traceback
 from flask import Flask, jsonify
 
 app = Flask(__name__)
@@ -9,15 +10,19 @@ logger = logging.getLogger(__name__)
 
 @app.route('/trigger-error')
 def trigger_error():
-    response = {
-        "error": "Something went wrong",
-        "code": 400,
-        "message": "This is a simulated error response"
-    }
-    # Log the error explicitly
-    logger.error(f"Error triggered: {response}")
-    
-    return jsonify(response), 400  # HTTP 400 Bad Request
+    try:
+        # Simulate an error by raising an exception
+        raise ValueError("Simulated error for testing stack trace logging")
+    except Exception as e:
+        # Log the error with stack trace
+        logger.error("Error triggered", exc_info=True)
+
+        response = {
+            "error": "Something went wrong",
+            "code": 400,
+            "message": str(e)
+        }
+        return jsonify(response), 400  # HTTP 400 Bad Request
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
