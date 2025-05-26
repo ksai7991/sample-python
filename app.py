@@ -5,24 +5,33 @@ from flask import Flask, jsonify
 app = Flask(__name__)
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
 @app.route('/trigger-error')
 def trigger_error():
     try:
-        # Simulate an error by raising an exception
-        raise ValueError("Simulated error for testing stack trace logging")
+        simulate_error()
     except Exception as e:
-        # Log the error with stack trace
-        logger.error("Error triggered", exc_info=True)
+        # Get the full formatted traceback as a string
+        stack_trace = traceback.format_exc()
+
+        # Log the full stack trace
+        logger.error("Full stack trace:\n%s", stack_trace)
 
         response = {
             "error": "Something went wrong",
             "code": 400,
-            "message": str(e)
+            "message": str(e),
+            "trace": stack_trace.splitlines()[-1]  # Optionally send only the last line
         }
-        return jsonify(response), 400  # HTTP 400 Bad Request
+        return jsonify(response), 400
+
+def simulate_error():
+    nested_function()
+
+def nested_function():
+    raise ValueError("Simulated error in nested function")
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
