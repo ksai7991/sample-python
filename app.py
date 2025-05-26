@@ -1,5 +1,6 @@
 import logging
 import traceback
+import random
 from flask import Flask, jsonify
 
 app = Flask(__name__)
@@ -11,27 +12,27 @@ logger = logging.getLogger(__name__)
 @app.route('/trigger-error')
 def trigger_error():
     try:
-        simulate_error()
+        faulty_random_logic()
     except Exception as e:
-        # Get the full formatted traceback as a string
+        # Capture full stack trace
         stack_trace = traceback.format_exc()
 
-        # Log the full stack trace
+        # Log the error and the stack trace
         logger.error("Full stack trace:\n%s", stack_trace)
 
         response = {
             "error": "Something went wrong",
-            "code": 400,
+            "code": 500,
             "message": str(e),
-            "trace": stack_trace.splitlines()[-1]  # Optionally send only the last line
+            "trace": stack_trace.splitlines()[-1]
         }
-        return jsonify(response), 400
+        return jsonify(response), 500
 
-def simulate_error():
-    nested_function()
-
-def nested_function():
-    raise ValueError("Simulated error in nested function")
+def faulty_random_logic():
+    numbers = [random.randint(1, 100) for _ in range(5)]
+    logger.info(f"Generated numbers: {numbers}")
+    # Try to access an index that doesn't exist
+    return numbers[10]  # This will raise IndexError
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
