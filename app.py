@@ -1,12 +1,19 @@
 import logging
 import traceback
 import random
+import os
 from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+# Get container ID from environment
+CONTAINER_ID = os.getenv("HOSTNAME", "unknown-container")
+
+# Configure logging to include container ID
+logging.basicConfig(
+    level=logging.INFO,
+    format=f'%(asctime)s %(levelname)s [{CONTAINER_ID}] %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 @app.route('/trigger-error')
